@@ -2,6 +2,7 @@ package com.example.androiddevchallenge
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -12,6 +13,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.androiddevchallenge.Destinations.ANIMAL_DETAIL_ID
 import com.example.androiddevchallenge.ui.page.list.AnimalDetail
 import com.example.androiddevchallenge.ui.page.list.Animals
+import com.example.androiddevchallenge.vm.AnimalsViewModel
 
 object Destinations {
     const val ANIMALS_ROUTE = "animals"
@@ -20,7 +22,10 @@ object Destinations {
 }
 
 @Composable
-fun NavGraph(startDestination: String = Destinations.ANIMALS_ROUTE) {
+fun NavGraph(
+    startDestination: String = Destinations.ANIMALS_ROUTE,
+    animalsViewModel: AnimalsViewModel = viewModel()
+) {
     val navController = rememberNavController()
 
     val actions = remember(navController) { Actions(navController) }
@@ -29,16 +34,17 @@ fun NavGraph(startDestination: String = Destinations.ANIMALS_ROUTE) {
         startDestination = startDestination
     ) {
         composable(Destinations.ANIMALS_ROUTE) {
-            Animals(selectAnimal = actions.selectAnimal)
+            Animals(selectAnimal = actions.selectAnimal, animalsViewModel = animalsViewModel)
         }
         composable(
             "${Destinations.ANIMAL_DETAIL_ROUTE}/{$ANIMAL_DETAIL_ID}",
             arguments = listOf(navArgument(ANIMAL_DETAIL_ID) { type = NavType.LongType })
         ) { backStackEntry ->
             val arguments = requireNotNull(backStackEntry.arguments)
+            animalsViewModel.getAnimalById(arguments.getLong(ANIMAL_DETAIL_ID))
             AnimalDetail(
-                animalId = arguments.getLong(ANIMAL_DETAIL_ID),
-                upPress = actions.upPress
+                upPress = actions.upPress,
+                animalsViewModel = animalsViewModel
             )
         }
     }

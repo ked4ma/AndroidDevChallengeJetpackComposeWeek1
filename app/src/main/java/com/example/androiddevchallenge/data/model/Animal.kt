@@ -16,7 +16,8 @@ data class Animal(
     @IntRange(from = 0, to = 1200) val ageInMonth: Int,
     val breed: String,
     val gender: Gender,
-    val info: String
+    val info: String,
+    val favorite: Boolean = false
 ) : Parcelable {
     enum class Type {
         CAT, DOG

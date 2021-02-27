@@ -3,7 +3,7 @@ package com.example.androiddevchallenge.data.repository
 import com.example.androiddevchallenge.data.dao.AnimalDao
 import com.example.androiddevchallenge.data.model.Animal
 
-class AnimalRepository {
+object AnimalRepository {
     // use dummy dao
     private val dao = AnimalDao()
 
@@ -12,4 +12,6 @@ class AnimalRepository {
     fun getCats() = dao.getByType(Animal.Type.CAT)
 
     fun getById(id: Long) = dao.getById(id)
+
+    fun toggleFavorite(id: Long) = dao.toggleFavorite(id)
 }

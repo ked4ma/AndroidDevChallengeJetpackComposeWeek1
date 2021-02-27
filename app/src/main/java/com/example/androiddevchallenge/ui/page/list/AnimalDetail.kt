@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
@@ -24,10 +25,12 @@ import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.Favorite
+import androidx.compose.material.icons.rounded.FavoriteBorder
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -42,17 +45,17 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.androiddevchallenge.R
 import com.example.androiddevchallenge.data.model.Animal
 import com.example.androiddevchallenge.ui.theme.MyTheme
+import com.example.androiddevchallenge.ui.theme.pink
 import com.example.androiddevchallenge.util.quantityStringResource
 import com.example.androiddevchallenge.vm.AnimalsViewModel
 import dev.chrisbanes.accompanist.insets.statusBarsPadding
 
 @Composable
 fun AnimalDetail(
-    animalId: Long,
     upPress: () -> Unit,
     animalsViewModel: AnimalsViewModel = viewModel()
 ) {
-    val animal: Animal? by animalsViewModel.getAnimalById(animalId).collectAsState(initial = null)
+    val animal: Animal? by animalsViewModel.detailAnimal.observeAsState()
 
     if (animal == null) {
         Box {
@@ -62,21 +65,24 @@ fun AnimalDetail(
             )
         }
     } else {
-        AnimalDetail(animal!!, upPress)
+        AnimalDetail(animal!!, upPress) {
+            animalsViewModel.favorite(it)
+        }
     }
 }
 
 @Composable
 private fun AnimalDetail(
     animal: Animal,
-    upPress: () -> Unit
+    upPress: () -> Unit,
+    favorite: (Long) -> Unit
 ) {
     Surface(
         modifier = Modifier.fillMaxSize(),
     ) {
         LazyColumn {
             item { AnimalDetailHeader(animal, upPress) }
-            item { AnimalDetailBody(animal) }
+            item { AnimalDetailBody(animal, favorite) }
         }
     }
 }
@@ -124,7 +130,8 @@ private fun AnimalDetailHeader(
 
 @Composable
 private fun AnimalDetailBody(
-    animal: Animal
+    animal: Animal,
+    favorite: (Long) -> Unit
 ) {
     Spacer(modifier = Modifier.height(16.dp))
     Text(
@@ -151,6 +158,27 @@ private fun AnimalDetailBody(
                 text = animal.gender.name,
                 style = MaterialTheme.typography.h6,
             )
+        }
+    }
+    Box(modifier = Modifier.fillMaxWidth()) {
+        IconButton(
+            modifier = Modifier.align(Alignment.Center),
+            onClick = { favorite(animal.id) }
+        ) {
+            if (animal.favorite) {
+                Icon(
+                    Icons.Rounded.Favorite,
+                    contentDescription = null,
+                    modifier = Modifier.size(36.dp),
+                    tint = pink
+                )
+            } else {
+                Icon(
+                    Icons.Rounded.FavoriteBorder,
+                    contentDescription = null,
+                    modifier = Modifier.size(36.dp)
+                )
+            }
         }
     }
     Divider(modifier = Modifier.padding(16.dp))
@@ -214,7 +242,7 @@ fun AnimalDetailBodyPreview() {
                         Animal.Gender.MALE,
                         "info"
                     )
-                )
+                ) { }
             }
         }
     }

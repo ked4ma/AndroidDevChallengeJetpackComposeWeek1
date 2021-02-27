@@ -2,15 +2,27 @@ package com.example.androiddevchallenge.data.dao
 
 import com.example.androiddevchallenge.R
 import com.example.androiddevchallenge.data.model.Animal
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 
 class AnimalDao {
-    private val cache: List<Animal> = (MALE_DOGS + FEMALE_DOGS + MALE_CATS + FEMALE_CATS).shuffled()
+    private var cache: List<Animal> = (MALE_DOGS + FEMALE_DOGS + MALE_CATS + FEMALE_CATS).also {
+        println("here")
+    }.shuffled()
 
     fun getAll() = flowOf(cache)
     fun getByType(type: Animal.Type) = flowOf(cache.filter { it.type == type })
 
     fun getById(id: Long) = flowOf(cache.find { it.id == id })
+
+    fun toggleFavorite(id: Long) = flow {
+        cache = cache.map {
+            if (it.id == id) {
+                it.copy(favorite = !it.favorite)
+            } else it
+        }
+        emit(cache.find { it.id == id })
+    }
 
     companion object {
         private val MALE_DOGS = listOf(
@@ -400,7 +412,7 @@ class AnimalDao {
                 38,
                 Animal.Type.DOG,
                 "Penny",
-                R.mipmap.welsh_springer_spaniel,
+                R.mipmap.yakutian_laika,
                 3,
                 "Yakutian Laika",
                 Animal.Gender.FEMALE,

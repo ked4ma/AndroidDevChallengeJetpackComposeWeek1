@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class AnimalsViewModel : ViewModel() {
-    private val animalRepository = AnimalRepository()
+    private val animalRepository = AnimalRepository
 
     private val _animalList = MutableLiveData(emptyList<Animal>())
     val animalList: LiveData<List<Animal>> get() = _animalList
@@ -20,15 +20,51 @@ class AnimalsViewModel : ViewModel() {
     val animalFilter: LiveData<AnimalFilter> get() = _animalFilter
 
     init {
+        load()
+    }
+
+    private fun load() {
         viewModelScope.launch(Dispatchers.IO) {
-            animalRepository.getAll().collect {
-                println(it.size)
+            when (animalFilter.value ?: AnimalFilter.ALL) {
+                AnimalFilter.ALL -> animalRepository.getAll()
+                AnimalFilter.DOG -> animalRepository.getDogs()
+                AnimalFilter.CAT -> animalRepository.getCats()
+            }.collect {
                 _animalList.postValue(it)
             }
         }
     }
 
-    fun getAnimalById(id: Long) = animalRepository.getById(id)
+    fun selectFilter(filter: AnimalFilter) {
+        _animalFilter.value = filter
+        load()
+    }
+
+    private val _detailAnimal = MutableLiveData<Animal>()
+    val detailAnimal: LiveData<Animal> get() = _detailAnimal
+
+    fun getAnimalById(id: Long) {
+        viewModelScope.launch(Dispatchers.IO) {
+            animalRepository.getById(id).collect {
+                _detailAnimal.postValue(it)
+            }
+        }
+    }
+
+    fun favorite(id: Long) {
+        viewModelScope.launch(Dispatchers.IO) {
+            animalRepository.toggleFavorite(id).collect {
+                val animal = it ?: return@collect
+                val list = _animalList.value ?: return@collect
+                _animalList.postValue(list.map { current ->
+                    if (current.id == animal.id) animal else current
+                })
+                println(animal)
+                println(_animalList.value?.firstOrNull())
+                _detailAnimal.postValue(animal)
+            }
+        }
+    }
 }
 
 enum class AnimalFilter {
