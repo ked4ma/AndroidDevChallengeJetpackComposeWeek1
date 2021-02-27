@@ -10,4 +10,14 @@
       the License.
       -->
     <string name="app_name">AndroidDevChallenge</string>
+
+    <string name="puppy">🐶</string>
+    <string name="not_found">Not Found</string>
+    <string name="label_back">back</string>
+
+    <!-- Animal -->
+    <plurals name="age">
+        <item quantity="one">1 month</item>
+        <item quantity="other">%d months</item>
+    </plurals>
 </resources>
