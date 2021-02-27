@@ -1,3 +1,18 @@
+/*
+ * Copyright 2021 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.example.androiddevchallenge.ui.page.list
 
 import androidx.compose.foundation.Image
@@ -62,7 +77,8 @@ fun Animals(selectAnimal: (Long) -> Unit, animalsViewModel: AnimalsViewModel = v
         selectAnimal = selectAnimal,
         selectFilter = {
             animalsViewModel.selectFilter(it)
-        })
+        }
+    )
 }
 
 @Composable
@@ -104,15 +120,18 @@ private fun FilterMenu(
         IconButton(
             modifier = Modifier
                 .size(40.dp),
-            onClick = { expanded = true }) {
+            onClick = { expanded = true }
+        ) {
             Icon(imageVector = Icons.Default.Filter, null)
         }
         DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
             filters.forEach { filter ->
-                DropdownMenuItem(onClick = {
-                    selectFilter(filter)
-                    expanded = false
-                }) {
+                DropdownMenuItem(
+                    onClick = {
+                        selectFilter(filter)
+                        expanded = false
+                    }
+                ) {
                     if (filter == selected) {
                         Text(text = filter.name)
                     } else {
@@ -190,11 +209,13 @@ private fun AnimalItem(
                     Spacer(
                         modifier = Modifier
                             .requiredSize(60.dp)
-                            .clip(GenericShape { size, _ ->
-                                lineTo(size.width / 3, 0F)
-                                lineTo(0F, size.height / 3)
-                                lineTo(0F, 0F)
-                            })
+                            .clip(
+                                GenericShape { size, _ ->
+                                    lineTo(size.width / 3, 0F)
+                                    lineTo(0F, size.height / 3)
+                                    lineTo(0F, 0F)
+                                }
+                            )
                             .background(color = pink)
                             .align(Alignment.TopStart)
                     )
@@ -237,7 +258,6 @@ private fun AnimalItem(
                     }
             )
         }
-
     }
 }
 

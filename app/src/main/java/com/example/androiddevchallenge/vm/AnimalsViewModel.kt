@@ -1,3 +1,18 @@
+/*
+ * Copyright 2021 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.example.androiddevchallenge.vm
 
 import androidx.lifecycle.LiveData
@@ -56,9 +71,11 @@ class AnimalsViewModel : ViewModel() {
             animalRepository.toggleFavorite(id).collect {
                 val animal = it ?: return@collect
                 val list = _animalList.value ?: return@collect
-                _animalList.postValue(list.map { current ->
-                    if (current.id == animal.id) animal else current
-                })
+                _animalList.postValue(
+                    list.map { current ->
+                        if (current.id == animal.id) animal else current
+                    }
+                )
                 println(animal)
                 println(_animalList.value?.firstOrNull())
                 _detailAnimal.postValue(animal)
